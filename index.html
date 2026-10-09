@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quiz 2A - Bài 9</title>
+<style>
+  :root {
+    --primary: #2563eb;
+    --primary-hover: #1d4ed8;
+    --bg-gradient: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+    --card-bg: #ffffff;
+    --text-main: #1e40af;
+    --text-muted: #475569;
+    --correct-bg: #dcfce7;
+    --correct-border: #22c55e;
+    --correct-text: #15803d;
+    --wrong-bg: #fee2e2;
+    --wrong-border: #ef4444;
+    --wrong-text: #b91c1c;
+  }
+
+  * {
+    box-sizing: border-box;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+
+  body {
+    margin: 0;
+    padding: 20px 12px;
+    background: var(--bg-gradient);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #1e293b;
+  }
+
+  .card {
+    width: 100%;
+    max-width: 650px;
+    background: var(--card-bg);
+    border-radius: 24px;
+    padding: 28px;
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+  }
+
+  header {
+    text-align: center;
+    margin-bottom: 20px;
+  }
+
+  h1 {
+    font-size: 24px;
+    margin: 0 0 6px 0;
+    color: var(--text-main);
+  }
+
+  .sub {
+    color: var(--text-muted);
+    font-size: 14px;
+  }
+
+  .progress-container {
+    height: 10px;
+    background: #e2e8f0;
+    border-radius: 10px;
+    overflow: hidden;
+    margin-top: 16px;
+  }
+
+  .progress-bar {
+    height: 100%;
+    background: var(--primary);
+    width: 0%;
+    transition: width 0.3s ease;
+  }
+
+  .meta {
+    display: flex;
+    justify-content: space-between;
+    margin: 16px 0 20px 0;
+    font-weight: 600;
+    font-size: 15px;
+    color: var(--text-muted);
+  }
+
+  .question-box {
+    text-align: center;
+    font-size: 28px;
+    font-weight: 800;
+    margin: 20px 0 28px 0;
+    color: #0f172a;
+    min-height: 45px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .answers-grid {
+    display: grid;
+    gap: 12px;
+  }
+
+  .answer-btn {
+    padding: 16px 20px;
+    border: 2px solid #e2e8f0;
+    border-radius: 16px;
+    background: #f8fafc;
+    text-align: left;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    color: #1e293b;
+  }
+
+  .answer-btn:hover:not(:disabled) {
+    background: #eff6ff;
+    border-color: var(--primary);
+  }
+
+  .answer-btn.correct {
+    background: var(--correct-bg);
+    border-color: var(--correct-border);
+    color: var(--correct-text);
+  }
+
+  .answer-btn.wrong {
+    background: var(--wrong-bg);
+    border-color: var(--wrong-border);
+    color: var(--wrong-text);
+  }
+
+  .feedback {
+    text-align: center;
+    min-height: 28px;
+    margin: 16px 0;
+    font-weight: 700;
+    font-size: 16px;
+  }
+
+  .next-btn, .restart-btn {
+    width: 100%;
+    padding: 16px;
+    border: 0;
+    border-radius: 16px;
+    background: var(--primary);
+    color: #ffffff;
+    font-size: 17px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.2s ease;
+  }
+
+  .next-btn:hover, .restart-btn:hover {
+    background: var(--primary-hover);
+  }
+
+  .settings {
+    display: flex;
+    gap: 12px;
+    margin-top: 24px;
+    padding-top: 16px;
+    border-top: 1px solid #f1f5f9;
+  }
+
+  .settings select {
+    flex: 1;
+    padding: 12px;
+    border-radius: 12px;
+    border: 1px solid #cbd5e1;
+    background: #ffffff;
+    font-size: 14px;
+    color: #1e293b;
+    font-weight: 500;
+  }
+
+  .hidden { display: none !important; }
+
+  .result-box { text-align: center; padding: 20px 0; }
+
+  .final-score {
+    font-size: 52px;
+    font-weight: 900;
+    color: var(--primary);
+    margin: 12px 0;
+  }
+
+  .result-msg {
+    font-size: 17px;
+    color: var(--text-muted);
+    margin-bottom: 24px;
+  }
+</style>
+</head>
+<body>
+
+<div class="card">
+  <!-- Quiz Section -->
+  <div id="quiz-section">
+    <header>
+      <h1>🇰🇷 Quiz 2A — Bài 9</h1>
+      <div class="sub">Chủ đề: 문의할 게 있는데요 (Liên lạc & Hỏi thông tin)</div>
+    </header>
+
+    <div class="progress-container">
+      <div id="progress-bar" class="progress-bar"></div>
+    </div>
+
+    <div class="meta">
+      <span id="counter">Câu 1/10</span>
+      <span id="score">Điểm: 0</span>
+    </div>
+
+    <div id="question" class="question-box"></div>
+    <div id="answers" class="answers-grid"></div>
+    <div id="feedback" class="feedback"></div>
+
+    <button id="next-btn" class="next-btn hidden">Câu tiếp theo →</button>
+
+    <div class="settings">
+      <select id="mode-select">
+        <option value="ko">🇰🇷 Hàn → Việt</option>
+        <option value="vi">🇻🇳 Việt → Hàn</option>
+      </select>
+      <select id="amount-select">
+        <option value="10">10 câu</option>
+        <option value="20">20 câu</option>
+        <option value="30">30 câu</option>
+        <option value="64">Tất cả (64 câu)</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Result Section -->
+  <div id="result-section" class="result-box hidden">
+    <h1>🎉 Hoàn thành!</h1>
+    <div id="final-score" class="final-score">0/0</div>
+    <p id="result-message" class="result-msg"></p>
+    <button id="restart-btn" class="restart-btn">🔄 Làm lại bài Quiz</button>
+  </div>
+</div>
+
+<script>
+  const WORDS = [
+    // S【9과】
+    {"ko": "전화를 걸다", "vi": "Gọi điện thoại"},
+    {"ko": "전화가 오다", "vi": "Có điện thoại gọi đến"},
+    {"ko": "전화를 받다", "vi": "Nghe điện thoại"},
+    {"ko": "전화를 바꾸다", "vi": "Chuyển máy (cho người khác)"},
+    {"ko": "통화를 하다", "vi": "Nói chuyện điện thoại"},
+    {"ko": "전화를 끊다", "vi": "Cúp máy / Tắt điện thoại"},
+    {"ko": "문자를 보내다", "vi": "Gửi tin nhắn"},
+    {"ko": "문자를 받다", "vi": "Nhận tin nhắn"},
+    {"ko": "문자를 지우다", "vi": "Xóa tin nhắn"},
+    {"ko": "대상", "vi": "Đối tượng"},
+    {"ko": "장소", "vi": "Địa điểm"},
+    {"ko": "기간", "vi": "Thời gian / Thời hạn"},
+    {"ko": "참가비", "vi": "Phí tham gia"},
+    {"ko": "접수", "vi": "Tiếp nhận / Đăng ký"},
+    {"ko": "문의", "vi": "Hỏi đáp / Tư vấn"},
+    {"ko": "부탁하다", "vi": "Nhờ vả / Thỉnh cầu"},
+    {"ko": "공사", "vi": "Thi công / Công trình"},
+    {"ko": "국립국악원", "vi": "Viện Âm nhạc Truyền thống Quốc gia"},
+    {"ko": "외국인", "vi": "Người nước ngoài"},
+    {"ko": "~을/를 위한", "vi": "Dành cho ~"},
+    {"ko": "국악", "vi": "Âm nhạc truyền thống Hàn Quốc"},
+    {"ko": "국립극장", "vi": "Nhà hát Quốc gia"},
+    {"ko": "김치박물관", "vi": "Bảo tàng Kimchi"},
+    {"ko": "예술의전당", "vi": "Trung tâm Nghệ thuật Seoul"},
+    {"ko": "동양화", "vi": "Tranh Đông Phương / Tranh thủy mặc"},
+    {"ko": "아프리카", "vi": "Châu Phi"},
+    {"ko": "전시", "vi": "Triển lãm / Trưng bày"},
+    {"ko": "애니메이션", "vi": "Phim hoạt hình"},
+    {"ko": "상영", "vi": "Chiếu phim / Công chiếu"},
+    {"ko": "남다", "vi": "Còn lại / Dư thừa"},
+    {"ko": "말씀하다", "vi": "Nói (kính ngữ)"},
+    {"ko": "무료", "vi": "Miễn phí"},
+    {"ko": "태권도복", "vi": "Võ phục Taekwondo"},
+    {"ko": "다도", "vi": "Trà đạo"},
+    {"ko": "악기", "vi": "Nhạc cụ"},
+    {"ko": "경희궁", "vi": "Cung Khánh Hỉ"},
+    {"ko": "체험", "vi": "Trải nghiệm"},
+    {"ko": "재료비", "vi": "Chi phí nguyên vật liệu"},
+    {"ko": "퀴즈", "vi": "Câu hỏi đố / Quiz"},
+    {"ko": "프로그램", "vi": "Chương trình"},
+    {"ko": "참가하다", "vi": "Tham gia"},
+    {"ko": "한국학", "vi": "Hàn Quốc học"},
+    {"ko": "궁금하다", "vi": "Thắc mắc / Tò mò"},
+    {"ko": "문제가 있다", "vi": "Có vấn đề / Bị lỗi"},
+    {"ko": "갑자기", "vi": "Đột nhiên"},
+    {"ko": "상담원", "vi": "Nhân viên tư vấn"},
+    {"ko": "통역하다", "vi": "Phiên dịch"},
+    {"ko": "치료를 받다", "vi": "Nhận điều trị / Khám bệnh"},
+    {"ko": "통역", "vi": "Phiên dịch"},
+    {"ko": "서비스", "vi": "Dịch vụ"},
+    {"ko": "정보를 얻다", "vi": "Thu thập thông tin"},
+
+    // W【9과】
+    {"ko": "뜻", "vi": "Ý nghĩa"},
+    {"ko": "스팸 문자", "vi": "Tin nhắn rác / Spam"},
+    {"ko": "미리", "vi": "Trước"},
+    {"ko": "부탁하다", "vi": "Nhờ vả"},
+    {"ko": "공사하다", "vi": "Thi công / Xây dựng"},
+    {"ko": "수리", "vi": "Sửa chữa"},
+    {"ko": "외출", "vi": "Đi ra ngoài"},
+    {"ko": "상영", "vi": "Chiếu phim"},
+    {"ko": "생강차", "vi": "Trà gừng"},
+    {"ko": "악기", "vi": "Nhạc cụ"},
+    {"ko": "장구", "vi": "Trống Janggu"},
+    {"ko": "물론이다", "vi": "Tất nhiên rồi"},
+    {"ko": "틀리다", "vi": "Sai / Khác"}
+  ];
+
+  let pool = [];
+  let currentIndex = 0;
+  let score = 0;
+  let isAnswered = false;
+
+  const quizSection = document.getElementById("quiz-section");
+  const resultSection = document.getElementById("result-section");
+  const questionEl = document.getElementById("question");
+  const answersEl = document.getElementById("answers");
+  const feedbackEl = document.getElementById("feedback");
+  const counterEl = document.getElementById("counter");
+  const scoreEl = document.getElementById("score");
+  const progressBar = document.getElementById("progress-bar");
+  const nextBtn = document.getElementById("next-btn");
+  const restartBtn = document.getElementById("restart-btn");
+  const modeSelect = document.getElementById("mode-select");
+  const amountSelect = document.getElementById("amount-select");
+  const finalScoreEl = document.getElementById("final-score");
+  const resultMessageEl = document.getElementById("result-message");
+
+  function shuffle(array) {
+    const arr = [...array];
+    for (let i = arr.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr;
+  }
+
+  function startQuiz() {
+    const amount = parseInt(amountSelect.value, 10);
+    pool = shuffle(WORDS).slice(0, amount);
+    currentIndex = 0;
+    score = 0;
+
+    quizSection.classList.remove("hidden");
+    resultSection.classList.add("hidden");
+    loadQuestion();
+  }
+
+  function loadQuestion() {
+    isAnswered = false;
+    const currentItem = pool[currentIndex];
+    const mode = modeSelect.value;
+
+    const promptText = mode === "ko" ? currentItem.ko : currentItem.vi;
+    const correctAnswer = mode === "ko" ? currentItem.vi : currentItem.ko;
+
+    counterEl.textContent = `Câu ${currentIndex + 1}/${pool.length}`;
+    scoreEl.textContent = `Điểm: ${score}`;
+    progressBar.style.width = `${(currentIndex / pool.length) * 100}%`;
+    questionEl.textContent = promptText;
+    feedbackEl.textContent = "";
+    nextBtn.classList.add("hidden");
+
+    const otherItems = shuffle(WORDS.filter(w => w.ko !== currentItem.ko)).slice(0, 3);
+    let choices = [correctAnswer];
+    otherItems.forEach(item => {
+      choices.push(mode === "ko" ? item.vi : item.ko);
+    });
+    choices = shuffle(choices);
+
+    answersEl.innerHTML = "";
+    choices.forEach((choice, idx) => {
+      const btn = document.createElement("button");
+      btn.className = "answer-btn";
+      btn.textContent = `${String.fromCharCode(65 + idx)}. ${choice}`;
+      btn.onclick = () => handleAnswer(choice, correctAnswer, btn);
+      answersEl.appendChild(btn);
+    });
+  }
+
+  function handleAnswer(selectedChoice, correctAnswer, selectedBtn) {
+    if (isAnswered) return;
+    isAnswered = true;
+
+    const allButtons = answersEl.querySelectorAll(".answer-btn");
+    allButtons.forEach(btn => btn.disabled = true);
+
+    if (selectedChoice === correctAnswer) {
+      score++;
+      selectedBtn.classList.add("correct");
+      feedbackEl.textContent = "✅ Chính xác!";
+      feedbackEl.style.color = "var(--correct-text)";
+    } else {
+      selectedBtn.classList.add("wrong");
+      allButtons.forEach(btn => {
+        if (btn.textContent.slice(3) === correctAnswer) {
+          btn.classList.add("correct");
+        }
+      });
+      feedbackEl.textContent = `❌ Sai rồi! Đáp án đúng: ${correctAnswer}`;
+      feedbackEl.style.color = "var(--wrong-text)";
+    }
+
+    scoreEl.textContent = `Điểm: ${score}`;
+    nextBtn.classList.remove("hidden");
+  }
+
+  function nextQuestion() {
+    currentIndex++;
+    if (currentIndex < pool.length) {
+      loadQuestion();
+    } else {
+      showResults();
+    }
+  }
+
+  function showResults() {
+    const percentage = Math.round((score / pool.length) * 100);
+    quizSection.classList.add("hidden");
+    resultSection.classList.remove("hidden");
+
+    finalScoreEl.textContent = `${score}/${pool.length} (${percentage}%)`;
+
+    if (percentage >= 90) {
+      resultMessageEl.textContent = "🔥 Xuất sắc! Bạn thuộc từ vựng Bài 9 rất siêu.";
+    } else if (percentage >= 70) {
+      resultMessageEl.textContent = "👏 Khá tốt! Luyện tập thêm chút nữa là hoàn hảo.";
+    } else if (percentage >= 50) {
+      resultMessageEl.textContent = "💪 Tạm ổn! Hãy thử lại để tăng điểm nhé.";
+    } else {
+      resultMessageEl.textContent = "📚 Cố lên! Hãy ôn lại từ vựng Bài 9 và làm lại.";
+    }
+  }
+
+  nextBtn.onclick = nextQuestion;
+  restartBtn.onclick = startQuiz;
+  modeSelect.onchange = startQuiz;
+  amountSelect.onchange = startQuiz;
+
+  startQuiz();
+</script>
+
+</body>
+</html>
